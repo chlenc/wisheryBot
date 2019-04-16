@@ -1,0 +1,24 @@
+{
+  "name": "wisherybot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/chlenc/wisheryBot.git"
+  },
+  "author": "chlenc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chlenc/wisheryBot/issues"
+  },
+  "homepage": "https://github.com/chlenc/wisheryBot#readme",
+  "dependencies": {
+    "dotenv": "^7.0.0",
+    "firebase-admin": "^7.2.0",
+    "node-telegram-bot-api": "^0.30.0"
+  }
+}
