@@ -1,0 +1,20 @@
+{
+  "tags": [
+    {
+      "name": "Пинг понг",
+      "code": "ping"
+    },
+    {
+      "name": "Кофе",
+      "code": "coffee"
+    },
+    {
+      "name": "Блокчейн",
+      "code": "block"
+    },
+    {
+      "name": "Обед",
+      "code": "dinner"
+    }
+  ]
+}

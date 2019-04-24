@@ -1,41 +1,64 @@
 const kb = require('./keyboard-buttons');
+const tags = require('./tags').tags;
 
 module.exports = {
     phone: {
         reply_markup: {
-            keyboard: [
-                [kb.phone],
-            ]
+            keyboard: [[kb.phone]],
+            one_time_keyboard: true
         }
     },
     home: {
         reply_markup: {
             keyboard: [
-                [kb.home.income, kb.home.outcome],
-                [kb.home.report],
-                [kb.home.help, kb.home.feedback],
+                [kb.home.add, kb.home.search],
+                [kb.home.feedback, kb.home.settings],
+                [kb.home.myMatches, kb.home.share],
             ]
         }
     },
-    pay_type:{
-        reply_markup: {
-            keyboard: [
-                [kb.cancel],
-                ['Безналичная'],
-                ['Наличная']
-            ]
+    tags(selectedTags, flag) {
+        return {
+            reply_markup: {
+                inline_keyboard: [...tags.map(({name, code}) => [{
+                    text: name + (selectedTags.includes(code) ? ' ✅' : ''),
+                    callback_data: code
+                }]), [kb.inline_tagsSubmit(flag)]]
+            }
         }
     },
-    feedback: {
-        reply_markup:{
-            inline_keyboard:[
-                [{
-                    text:'Связаться',
-                    callback_data: 'callback'
-                }]
-            ]
+
+    add_time: () => {
+
+        let date = new Date();
+        let out = [];
+        let i = 0;
+
+        const addZero = (v) => ('0' + v).slice(-2);
+
+        const getButton = (date) => ({
+            text: addZero(date.getHours()) + ':' + addZero(date.getMinutes()),
+            callback_data: date.getTime()
+        });
+
+        for (let r = 0; r < 7; r++) {
+            let row = [];
+            for (let c = 0; c < 4; c++) {
+                date.setMinutes(date.getMinutes() + i * 5);
+                row.push(getButton(date));
+                i++;
+            }
+            out.push(row)
         }
+
+        return {
+            reply_markup: {
+                inline_keyboard: out
+            }
+        }
+
     },
+
     items(budget_item) {
         var out = [[kb.cancel]];
         for (var temp in budget_item)
