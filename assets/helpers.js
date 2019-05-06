@@ -10,6 +10,17 @@ module.exports = {
     },
     updateUser(id, data) {
         return database.updateData('users/' + id, data)
+    },
+    addWish(wish){
+        return database.pushData('wishes/', wish)
+    },
+    getWishes(id){
+        let out;
+        out = database.getData('wishes/');
+        if(id){
+            // out.then()
+        }
+        return out;
     }
 
 };

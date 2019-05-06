@@ -33,25 +33,45 @@ bot.on('message', (msg) => {
             msg.contact.phone_number = ((msg.contact.phone_number[0] !== "+") ? '+' : '') + msg.contact.phone_number;
             helpers.updateUser(chatId, msg.contact);
             const selectedTags = tags.map(({code}) => code);
-            bot.sendMessage(chatId, frases.settings_tags, keyboards.tags(selectedTags,'SETTINGS'));
-            cache.put(chatId, {payload: {selectedTags}, state: 'TAGS', flag:'SETTINGS'});
+            bot.sendMessage(chatId, frases.settings_tags, keyboards.tags(selectedTags, 'SETTINGS'));
+            cache.put(chatId, {payload: {selectedTags}, state: 'TAGS', flag: 'SETTINGS'});
         } else if (msg.text === kb.home.add) {
             cache.put(chatId, {payload: {}, state: 'ADD_TITLE'});
             bot.sendMessage(chatId, frases.add_title)
-        } else if (msg.text === kb.home.search) {
+        } else if (msg.text === kb.home.search) {//todo
+            helpers.getWishes(chatId).then(wishes => {
+                helpers.getUser(chatId).then(user => {
+                    wishes = wishes.filter(({tags}) => {
+                        for (let i in tags) {
+                            if (user.tags.indexOf(tags[i]) !== -1) return true
+                        }
+                        return false;
+                    });
+
+                    for (let i = 0; i < wishes.length; i++) {
+                     // ({
+                     //     text: (i+1)+'',
+                     //     callback_data: 'SUBMIT_TAGS_' + flag
+                     // })
+                    }
+
+                })
+            });
             bot.sendMessage(chatId, frases.develop)
-        } else if (msg.text === kb.home.feedback) {
+        } else if (msg.text === kb.home.feedback) { //todo
             bot.sendMessage(chatId, frases.develop)
         } else if (msg.text === kb.home.settings) {
             helpers.getUser(chatId).then(user => {
                 const selectedTags = user.tags || [];
                 bot.sendMessage(chatId, frases.settings_tags, keyboards.tags(selectedTags, 'SETTINGS'));
-                cache.put(chatId, {payload: {selectedTags}, state: 'TAGS', flag:'SETTINGS'});
+                cache.put(chatId, {payload: {selectedTags}, state: 'TAGS', flag: 'SETTINGS'});
 
             })
         } else if (msg.text === kb.home.myMatches) {
-            bot.sendMessage(chatId, frases.develop)
-        } else if (msg.text === kb.home.share) {
+            helpers.getWishes(chatId).then(data => {
+                bot.sendMessage(chatId, `${data.title} ${data.time}`, keyboards.home)
+            })
+        } else if (msg.text === kb.home.share) { //todo
             bot.sendMessage(chatId, frases.develop)
         } else if (cacheData != null) {
             switch (cacheData.state) {
@@ -80,11 +100,11 @@ bot.on('callback_query', function (query) {
             bot.sendMessage(chat.id, frases.success_tags, keyboards.home);
             bot.deleteMessage(chat.id, message_id);
             cache.del(chat.id);
-        }else if(query.data === 'SUBMIT_TAGS_ADD'){
-            console.log(cacheData.payload)
-            cache.put(chat.id, {payload: {...cacheData.payload, time: query.data}, state: 'ADD_PIC'});
+        } else if (query.data === 'SUBMIT_TAGS_ADD') {
             bot.deleteMessage(chat.id, message_id);
-            //todo add match
+            helpers.addWish({...cacheData.payload, time: query.data, user_id: chat.id});
+            cache.del(chat.id);
+            bot.sendMessage(chat.id, frases.add_success, keyboards.home)
         } else if (cacheData != null) {
             switch (cacheData.state) {
                 case 'TAGS':
@@ -99,7 +119,7 @@ bot.on('callback_query', function (query) {
                     cache.put(chat.id, cacheData);
                     break;
                 case 'ADD_TIME':
-                    cache.put(chat.id, {payload: {...cacheData.payload, time: query.data}, state: 'TAGS', flag:'ADD'});
+                    cache.put(chat.id, {payload: {...cacheData.payload, time: query.data}, state: 'TAGS', flag: 'ADD'});
                     bot.sendMessage(chat.id, frases.settings_tags, keyboards.tags([], 'ADD'));
                     break;
             }
