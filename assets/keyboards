@@ -1,5 +1,6 @@
 const kb = require('./keyboard-buttons');
 const tags = require('./tags').tags;
+const helpers = require('./helpers');
 
 module.exports = {
     phone: {
@@ -10,7 +11,7 @@ module.exports = {
     },
     home: {
         reply_markup: {
-            keyboard: [
+            inline_keyboard: [
                 [kb.home.add, kb.home.search],
                 [kb.home.feedback, kb.home.settings],
                 [kb.home.myMatches, kb.home.share],
@@ -22,7 +23,7 @@ module.exports = {
             reply_markup: {
                 inline_keyboard: [...tags.map(({name, code}) => [{
                     text: name + (selectedTags.includes(code) ? ' ✅' : ''),
-                    callback_data: code
+                    callback_data: helpers.marshal(flag, code)
                 }]), [kb.inline_tagsSubmit(flag)]]
             }
         }
@@ -38,7 +39,7 @@ module.exports = {
 
         const getButton = (date) => ({
             text: addZero(date.getHours()) + ':' + addZero(date.getMinutes()),
-            callback_data: date.getTime()
+            callback_data: helpers.marshal('ADD_TIME', date.getTime())
         });
 
         for (let r = 0; r < 7; r++) {

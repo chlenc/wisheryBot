@@ -1,4 +1,5 @@
 const frases = require('./frases');
+const helpers = require('./helpers');
 
 module.exports = {
     phone: {
@@ -7,7 +8,7 @@ module.exports = {
     },
     inline_tagsSubmit: (flag) => ({
         text: 'Готово',
-        callback_data: 'SUBMIT_TAGS_' + flag
+        callback_data: helpers.marshal('SUBMIT_TAGS', flag)
     }),
 
 
@@ -16,12 +17,12 @@ module.exports = {
         callback_data: 'team_ready_yes'
     },
     home: {
-        search: 'Найти',
-        add: 'Добавить',
-        feedback: 'Обратная связь 📲',
-        share: 'Поделиться',
-        myMatches: 'Мои мачи',
-        settings: 'Настройки',
+        search: {text: 'Найти', callback_data: helpers.marshal('FIND_WISHES')},
+        add: {text: 'Добавить', callback_data: helpers.marshal('NEW_WISH')},
+        feedback: {text: 'Обратная связь 📲', callback_data: helpers.marshal('FEEDBACK')},
+        share: {text: 'Поделиться', callback_data: helpers.marshal('SHARE')},
+        myMatches: {text: 'Мои виши', callback_data: helpers.marshal('MY_WISHES')},
+        settings: {text: 'Настройки', callback_data: helpers.marshal('OPEN_SETTINGS')},
     },
     cancel: 'Отменить ❌',
 

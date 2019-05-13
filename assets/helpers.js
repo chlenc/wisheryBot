@@ -21,6 +21,9 @@ module.exports = {
             // out.then()
         }
         return out;
-    }
+    },
+    marshal : (state, payload) => JSON.stringify({state, payload: payload || {}}),
+    unmarshal : (data) => JSON.parse(data),
+    getTime: (time) => new Date(time).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")
 
 };
