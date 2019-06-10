@@ -60,16 +60,4 @@ module.exports = {
 
     },
 
-    items(budget_item) {
-        var out = [[kb.cancel]];
-        for (var temp in budget_item)
-            out.push([budget_item[temp]]);
-
-        return {
-            reply_markup: {
-                keyboard: out
-            }
-        }
-    }
-
 }

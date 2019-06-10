@@ -110,7 +110,7 @@ bot.on('message', (msg) => {
 bot.on('callback_query', function (query) {
     try {
         const chat = query.message.chat;
-        const message_id = query.message.message_id + '';;
+        const message_id = query.message.message_id + '';
         const cacheData = cache.get(chat.id);
 
         console.log(query.data);
@@ -176,7 +176,9 @@ bot.on('callback_query', function (query) {
                 helpers.getWishes(chat.id).then(data => {
                     const text = 'Список:\n\n' + Object.keys(data).map(wish => `${data[wish].title} ${helpers.getTime(data[wish].time)}`).join('\n');
                     bot.sendMessage(chat.id, text, keyboards.home).then(() => bot.deleteMessage(chat.id, message_id));
-                })
+                });
+            case 'FIND_WISHES': 
+                bot.sendMessage(chat.id,'hi')
                 break;
             case kb.home.share.callback_data:
                 bot.sendMessage(chat.id, frases.develop)
@@ -221,35 +223,7 @@ bot.on('callback_query', function (query) {
     }
 
 })
-//
-// bot.on('message', function (msg) {
-//     const chatId = msg.chat.id;
-//     let cache = cache.get(chatId);
-//
-//     bot.sendMessage(chatId, 'text', {
-//         reply_markup: JSON.stringify({
-//             inline_keyboard: [
-//                 [{ text: 'Кнопка 1', callback_data: '1' }],
-//                 [{ text: 'Кнопка 2', callback_data: 'data 2' }],
-//                 [{ text: 'Кнопка 3', callback_data: 'text 3' }]
-//             ]
-//         })
-//     })
-//     //
-//     // bot.sendMessage(msg.chat.id, frases.settings_tags, {
-//     //     reply_markup: JSON.stringify({
-//     //         inline_keyboard: [
-//     //             [{
-//     //                 text: 'Связаться',
-//     //                 callback_data: 'callback'
-//     //             }]
-//     //         ]
-//     //     })
-//     // });
-//
-//
-//
-// })
+
 
 
 console.log('Bot has been started ✅ ');
