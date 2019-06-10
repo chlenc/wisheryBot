@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "ts-node index.js",
+    "watch": "nodemon --watch 'assets/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' ./index.ts"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/chlenc/wisheryBot#readme",
   "dependencies": {
+    "@types/node-telegram-bot-api": "^0.31.0",
     "dotenv": "^7.0.0",
     "firebase-admin": "^7.2.0",
     "memory-cache": "^0.2.0",

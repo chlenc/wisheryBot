@@ -1,4 +1,5 @@
-const TelegramBot = require('node-telegram-bot-api');
+import * as TelegramBot from 'node-telegram-bot-api';
+
 require('dotenv').config();
 
 const frases = require('./assets/frases');
@@ -15,10 +16,11 @@ bot.onText(/\/start/, (msg) => {
     helpers.getUser(msg.chat.id).then(user => {
         if (user && user.phone_number) {
             const tags = tagsList.map(({code}) => code);
-            bot.sendMessage(msg.chat.id, frases.settings_tags, keyboards.tags(tags, 'TAGS'));
+            bot.sendMessage(msg.chat.id, frases.settings_tags, keyboards.tags(tags, 'TAGS'))
+                .catch(e => console.error(e))
             cache.put(msg.chat.id, {payload: {tags}, state: 'SETTINGS'});
         } else {
-            bot.sendMessage(msg.chat.id, frases.welcome_phone, keyboards.phone);
+            bot.sendMessage(msg.chat.id, frases.welcome_phone, keyboards.phone).catch(e => console.error(e));
         }
     })
 });
@@ -94,7 +96,7 @@ bot.on('message', (msg) => {
             switch (cacheData.state) {
                 case 'ADD_TITLE':
                     cache.put(chatId, {payload: {title: msg.text}, state: 'ADD_TIME'});
-                    bot.sendMessage(chatId, frases.add_time, keyboards.add_time());
+                    bot.sendMessage(chatId, frases.add_time, keyboards.add_time()).catch(e => console.error(e));
                     break;
 
             }
@@ -107,11 +109,12 @@ bot.on('message', (msg) => {
 
 bot.on('callback_query', function (query) {
     try {
-        const {chat, message_id} = query.message;
+        const chat = query.message.chat;
+        const message_id = query.message.message_id + '';;
         const cacheData = cache.get(chat.id);
 
-        console.log(query.data)
-        console.log(cacheData)
+        console.log(query.data);
+        console.log(cacheData);
 
         const data = helpers.unmarshal(query.data);
 
@@ -166,7 +169,7 @@ bot.on('callback_query', function (query) {
                 helpers.getUser(chat.id).then(user => {
                     const tags = user.tags || [];
                     bot.sendMessage(chat.id, frases.settings_tags, keyboards.tags(tags, 'TAGS'));
-                    cache.put(chat.id, {payload:  {tags}, state: 'SETTINGS'});
+                    cache.put(chat.id, {payload: {tags}, state: 'SETTINGS'});
                 }).then(() => bot.deleteMessage(chat.id, message_id));
                 break;
             case 'MY_WISHES':
