@@ -7,17 +7,16 @@ const helpers = require('./assets/helpers');
 const keyboards = require('./assets/keyboards');
 const kb = require('./assets/keyboard-buttons');
 const cache = require('memory-cache');
-const tags = require('./assets/tags').tags;
+const tagsList = require('./assets/tags').tags;
 
 
 bot.onText(/\/start/, (msg) => {
     helpers.updateUser(msg.chat.id, msg.from);
     helpers.getUser(msg.chat.id).then(user => {
         if (user && user.phone_number) {
-            const selectedTags = tags.map(({code}) => code);
-            bot.sendMessage(msg.chat.id, frases.settings_tags, keyboards.tags(selectedTags, 'TAGS'));
-            cache.put(msg.chat.id, {payload: selectedTags, state: 'SETTINGS'});
-            // console.log(msg.chat.id, cache.get(msg.chat.id))
+            const tags = tagsList.map(({code}) => code);
+            bot.sendMessage(msg.chat.id, frases.settings_tags, keyboards.tags(tags, 'TAGS'));
+            cache.put(msg.chat.id, {payload: {tags}, state: 'SETTINGS'});
         } else {
             bot.sendMessage(msg.chat.id, frases.welcome_phone, keyboards.phone);
         }
@@ -45,7 +44,7 @@ bot.on('message', (msg) => {
         if (msg.contact) {
             msg.contact.phone_number = ((msg.contact.phone_number[0] !== "+") ? '+' : '') + msg.contact.phone_number;
             helpers.updateUser(chatId, msg.contact);
-            const tags = tags.map(({code}) => code);
+            const tags = tagsList.map(({code}) => code);
             bot.sendMessage(chatId, frases.settings_tags, keyboards.tags(tags, 'TAGS'));
             cache.put(chatId, {payload: {tags}, state: 'SETTINGS'});
         }
@@ -119,16 +118,17 @@ bot.on('callback_query', function (query) {
 
         switch (data.state) {
             case 'TAGS':
-                const tags = Array.isArray(cacheData.payload) ? cacheData.payload : [];
+                const tags = Array.isArray(cacheData.payload.tags) ? cacheData.payload.tags : [];
                 const index = tags.indexOf(data.payload);
                 index === -1 ? tags.push(data.payload) : tags.splice(index, 1);
+
                 bot.sendMessage(chat.id, frases.settings_tags, keyboards.tags(tags, data.state))
                     .then(() => bot.deleteMessage(chat.id, message_id));
-                cache.put(chat.id, {state: cacheData.state, payload: tags});
+                cache.put(chat.id, {state: cacheData.state, payload: {...cacheData.payload, tags}});
                 break;
             case 'SUBMIT_TAGS':
                 if (cacheData.state === 'SETTINGS') {
-                    helpers.updateUser(chat.id, {tags: cacheData.payload});
+                    helpers.updateUser(chat.id, {tags: cacheData.payload.tags});
                     bot.sendMessage(chat.id, frases.success_tags, keyboards.home)
                         .then(() => bot.deleteMessage(chat.id, message_id));
                     cache.del(chat.id);
@@ -164,9 +164,9 @@ bot.on('callback_query', function (query) {
                 break;
             case 'OPEN_SETTINGS':
                 helpers.getUser(chat.id).then(user => {
-                    const selectedTags = user.tags || [];
-                    bot.sendMessage(chat.id, frases.settings_tags, keyboards.tags(selectedTags, 'TAGS'));
-                    cache.put(chat.id, {payload: selectedTags, state: 'SETTINGS'});
+                    const tags = user.tags || [];
+                    bot.sendMessage(chat.id, frases.settings_tags, keyboards.tags(tags, 'TAGS'));
+                    cache.put(chat.id, {payload:  {tags}, state: 'SETTINGS'});
                 }).then(() => bot.deleteMessage(chat.id, message_id));
                 break;
             case 'MY_WISHES':
