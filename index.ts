@@ -50,48 +50,6 @@ bot.on('message', (msg) => {
             bot.sendMessage(chatId, frases.settings_tags, keyboards.tags(tags, 'TAGS'));
             cache.put(chatId, {payload: {tags}, state: 'SETTINGS'});
         }
-        // else if (msg.text === kb.home.add) {
-        //     cache.put(chatId, {payload: {}, state: 'ADD_TITLE'});
-        //     bot.sendMessage(chatId, frases.add_title)
-        // } else if (msg.text === kb.home.search) {//todo
-        //     helpers.getWishes(chatId).then(wishes => {
-        //         helpers.getUser(chatId).then(user => {
-        //             wishes = wishes.filter(({tags}) => {
-        //                 for (let i in tags) {
-        //                     if (user.tags.indexOf(tags[i]) !== -1) return true
-        //                 }
-        //                 return false;
-        //             });
-        //
-        //             for (let i = 0; i < wishes.length; i++) {
-        //              // ({
-        //              //     text: (i+1)+'',
-        //              //     callback_data: 'SUBMIT_TAGS_' + flag
-        //              // })
-        //             }
-        //
-        //         })
-        //     });
-        //     bot.sendMessage(chatId, frases.develop)
-        // } else if (msg.text === kb.home.feedback) { //todo
-        //     bot.sendMessage(chatId, frases.develop)
-        // } else if (msg.text === kb.home.settings) {
-        //     helpers.getUser(chatId).then(user => {
-        //         const selectedTags = user.tags || [];
-        //         bot.sendMessage(chatId, frases.settings_tags, keyboards.tags(selectedTags, 'SETTINGS'));
-        //         cache.put(chatId, {payload: {selectedTags}, state: 'TAGS', flag: 'SETTINGS'});
-        //
-        //     })
-        // } else if (msg.text === kb.home.myMatches) {
-        //     helpers.getWishes(chatId).then(data => {
-        //         console.log(data)
-        //         const text = 'Список:\n\n'+Object.keys(data).map(wish => `${data[wish].title} ${data[wish].time}`).join('\n');
-        //         console.log(text)
-        //         bot.sendMessage(chatId, text, keyboards.home)
-        //     })
-        // } else if (msg.text === kb.home.share) { //todo
-        //     bot.sendMessage(chatId, frases.develop)
-        // } else
         if (cacheData != null) {
             switch (cacheData.state) {
                 case 'ADD_TITLE':
@@ -177,8 +135,12 @@ bot.on('callback_query', function (query) {
                     const text = 'Список:\n\n' + Object.keys(data).map(wish => `${data[wish].title} ${helpers.getTime(data[wish].time)}`).join('\n');
                     bot.sendMessage(chat.id, text, keyboards.home).then(() => bot.deleteMessage(chat.id, message_id));
                 });
-            case 'FIND_WISHES': 
-                bot.sendMessage(chat.id,'hi')
+                break;
+            case 'FIND_WISHES':
+                helpers.getWishes(chat.id).then(data => {
+                    const text = 'Список:\n\n' + Object.keys(data).map(wish => `${data[wish].title} ${helpers.getTime(data[wish].time)}`).join('\n');
+                    bot.sendMessage(chat.id, text, keyboards.home).then(() => bot.deleteMessage(chat.id, message_id));
+                });
                 break;
             case kb.home.share.callback_data:
                 bot.sendMessage(chat.id, frases.develop)
@@ -189,35 +151,6 @@ bot.on('callback_query', function (query) {
         if (cacheData != null) {
         }
 
-        // if (query.data === 'SUBMIT_TAGS_SETTINGS') {
-        //     helpers.updateUser(chat.id, {tags: cacheData.payload.selectedTags});
-        //     bot.sendMessage(chat.id, frases.success_tags, keyboards.home);
-        //     bot.deleteMessage(chat.id, message_id);
-        //     cache.del(chat.id);
-        // } else if (query.data === 'SUBMIT_TAGS_ADD') {
-        //     bot.deleteMessage(chat.id, message_id);
-        //     helpers.addWish({...cacheData.payload, time: query.data, user_id: chat.id});
-        //     cache.del(chat.id);
-        //     bot.sendMessage(chat.id, frases.add_success, keyboards.home)
-        // } else if (cacheData != null) {
-        //     switch (cacheData.state) {
-        //         case 'TAGS':
-        //             if (!Array.isArray(cacheData.payload.selectedTags)) cacheData.payload.selectedTags = [];
-        //             const index = cacheData.payload.selectedTags.indexOf(query.data);
-        //             index === -1
-        //                 ? cacheData.payload.selectedTags.push(query.data)
-        //                 : cacheData.payload.selectedTags.splice(index, 1);
-        //
-        //             bot.sendMessage(chat.id, frases.settings_tags, keyboards.tags(cacheData.payload.selectedTags, cacheData.flag));
-        //             bot.deleteMessage(chat.id, message_id);
-        //             cache.put(chat.id, cacheData);
-        //             break;
-        //         case 'ADD_TIME':
-        //             cache.put(chat.id, {payload: {...cacheData.payload, time: query.data}, state: 'TAGS', flag: 'ADD'});
-        //             bot.sendMessage(chat.id, frases.settings_tags, keyboards.tags([], 'ADD'));
-        //             break;
-        //     }
-        // }
     } catch (e) {
         console.log(e)
     }

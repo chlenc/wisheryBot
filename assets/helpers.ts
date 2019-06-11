@@ -15,12 +15,9 @@ module.exports = {
         return database.pushData('wishes/', wish)
     },
     getWishes(id){
-        let out;
-        out = database.getData('wishes/');
-        if(id){
-            // out.then()
-        }
-        return out;
+        const out = database.getData('wishes/');
+        const date = new Date().getTime();
+        return Object.keys(out).filter(key => out[key].time >= date && (id ? out[key].user_id === id : true))
     },
     marshal : (state, payload) => JSON.stringify({state, payload: payload || {}}),
     unmarshal : (data) => JSON.parse(data),
