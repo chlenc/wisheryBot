@@ -1,9 +1,9 @@
 import * as TelegramBot from 'node-telegram-bot-api';
-
 require('dotenv').config();
-
 const frases = require('./assets/frases');
-const bot = new TelegramBot(process.env.TOKEN, {polling: true});
+const bot = new TelegramBot(process.env.TOKEN, {webHook: {port: +process.env.PORT}})
+bot.setWebHook(`${process.env.URL}/bot${process.env.TOKEN}`).catch(e => console.error(e));
+
 const helpers = require('./assets/helpers');
 const keyboards = require('./assets/keyboards');
 const kb = require('./assets/keyboard-buttons');
@@ -49,14 +49,12 @@ bot.on('message', (msg) => {
             const tags = tagsList.map(({code}) => code);
             bot.sendMessage(chatId, frases.settings_tags, keyboards.tags(tags, 'TAGS'));
             cache.put(chatId, {payload: {tags}, state: 'SETTINGS'});
+
         }
         if (cacheData != null) {
-            switch (cacheData.state) {
-                case 'ADD_TITLE':
-                    cache.put(chatId, {payload: {title: msg.text}, state: 'ADD_TIME'});
-                    bot.sendMessage(chatId, frases.add_time, keyboards.add_time()).catch(e => console.error(e));
-                    break;
-
+            if (cacheData.state === 'ADD_TITLE') {
+                cache.put(chatId, {payload: {title: msg.text}, state: 'ADD_TIME'});
+                bot.sendMessage(chatId, frases.add_time, keyboards.add_time()).catch(e => console.error(e));
             }
         }
     } catch (e) {
@@ -94,7 +92,7 @@ bot.on('callback_query', function (query) {
                         .then(() => bot.deleteMessage(chat.id, message_id));
                     cache.del(chat.id);
                 } else if (cacheData.state === 'ADD') {
-                    helpers.addWish({...cacheData.payload, user_id: chat.id});
+                    helpers.addWish({...cacheData.payload, user_id: chat.id, username: chat.first_name});
                     cache.del(chat.id);
                     bot.sendMessage(chat.id, frases.add_success, keyboards.home)
                         .then(() => bot.deleteMessage(chat.id, message_id));
@@ -132,14 +130,20 @@ bot.on('callback_query', function (query) {
                 break;
             case 'MY_WISHES':
                 helpers.getWishes(chat.id).then(data => {
+                    console.log(data)
                     const text = 'Список:\n\n' + Object.keys(data).map(wish => `${data[wish].title} ${helpers.getTime(data[wish].time)}`).join('\n');
                     bot.sendMessage(chat.id, text, keyboards.home).then(() => bot.deleteMessage(chat.id, message_id));
                 });
                 break;
             case 'FIND_WISHES':
-                helpers.getWishes(chat.id).then(data => {
-                    const text = 'Список:\n\n' + Object.keys(data).map(wish => `${data[wish].title} ${helpers.getTime(data[wish].time)}`).join('\n');
-                    bot.sendMessage(chat.id, text, keyboards.home).then(() => bot.deleteMessage(chat.id, message_id));
+                helpers.getWishes().then(data => {
+                    console.log(data);
+                    const text = Object.keys(data).map(wish =>
+                        `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
+                        `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}`
+                    ).join('\n');
+                    bot.sendMessage(chat.id, text, {parse_mode: 'HTML', ...keyboards.home})//Markdown HTML
+                        .then(() => bot.deleteMessage(chat.id, message_id));
                 });
                 break;
             case kb.home.share.callback_data:
@@ -156,7 +160,6 @@ bot.on('callback_query', function (query) {
     }
 
 })
-
 
 
 console.log('Bot has been started ✅ ');

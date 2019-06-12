@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "commonjs"
+  },
+  "include": [
+    "*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

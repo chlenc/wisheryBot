@@ -11,16 +11,19 @@ module.exports = {
     updateUser(id, data) {
         return database.updateData('users/' + id, data)
     },
-    addWish(wish){
+    addWish(wish) {
         return database.pushData('wishes/', wish)
     },
-    getWishes(id){
-        const out = database.getData('wishes/');
-        const date = new Date().getTime();
-        return Object.keys(out).filter(key => out[key].time >= date && (id ? out[key].user_id === id : true))
+    getWishes(id?: number | string) {
+        return database.getData('wishes/').then(data => {
+            const date = new Date().getTime();
+            return Object.keys(data)
+                .filter(key => data[key].time >= date && (id ? data[key].user_id === id : true))
+                .map(key => ({...data[key], id: key}))
+        });
     },
-    marshal : (state, payload) => JSON.stringify({state, payload: payload || {}}),
-    unmarshal : (data) => JSON.parse(data),
+    marshal: (state, payload) => JSON.stringify({state, payload: payload || {}}),
+    unmarshal: (data) => JSON.parse(data),
     getTime: (time) => new Date(time).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")
 
 };
