@@ -1,4 +1,5 @@
 const database = require('./database');
+require('dotenv').config();
 
 module.exports = {
 
@@ -16,9 +17,11 @@ module.exports = {
     },
     getWishes(id?: number | string) {
         return database.getData('wishes/').then(data => {
-            const date = new Date().getTime();
+            let date = new Date();
+            date.setHours(date.getHours() + (+process.env.TIMEZZONE_OFFSET))
+            const time = date.getTime();
             return Object.keys(data)
-                .filter(key => data[key].time >= date && (id ? data[key].user_id === id : true))
+                .filter(key => data[key].time >= time && (id ? data[key].user_id === id : true))
                 .map(key => ({...data[key], id: key}))
         });
     },
