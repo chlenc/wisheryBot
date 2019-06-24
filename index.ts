@@ -142,10 +142,10 @@ bot.on('callback_query', function (query) {
                     for(let wish in keys){
                         if(text.length >= 3000){
                             bot.sendMessage(chat.id, text, {parse_mode: 'HTML'});
-                            text = '<br>'
+                            text = '\n'
                         }else {
                             text +=  `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
-                                `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}`+'<br><br>'
+                                `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}`+'\n\n'
                         }
                     }
                     // const text = Object.keys(data).map(wish =>
