@@ -1,7 +1,7 @@
 const kb = require('./keyboard-buttons');
 const tags = require('./tags').tags;
 const helpers = require('./helpers');
-require('dotenv').config();
+
 module.exports = {
     phone: {
         reply_markup: {
@@ -32,7 +32,6 @@ module.exports = {
     add_time: () => {
 
         let date = new Date();
-        date.setHours(date.getHours() + process.env.TIMEZZONE_OFFSET)
         let out = [];
         let i = 0;
 
