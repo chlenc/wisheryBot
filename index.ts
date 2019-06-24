@@ -137,12 +137,22 @@ bot.on('callback_query', function (query) {
                 break;
             case 'FIND_WISHES':
                 helpers.getWishes().then(data => {
-                    console.log(data);
-                    const text = Object.keys(data).map(wish =>
-                        `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
-                        `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}`
-                    ).join('\n');
-                    bot.sendMessage(chat.id, text, {parse_mode: 'HTML', ...keyboards.home})//Markdown HTML
+                    let text = '';
+                    const keys = Object.keys(data);
+                    for(let wish in keys){
+                        if(text.length >= 3000){
+                            bot.sendMessage(chat.id, text, {parse_mode: 'HTML'});
+                            text = '<br>'
+                        }else {
+                            text +=  `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
+                                `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}`+'<br><br>'
+                        }
+                    }
+                    // const text = Object.keys(data).map(wish =>
+                    //     `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
+                    //     `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}`
+                    // ).join('\n');
+                    bot.sendMessage(chat.id, text, {parse_mode: 'HTML', ...keyboards.home})
                         .then(() => bot.deleteMessage(chat.id, message_id));
                 });
                 break;
