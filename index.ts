@@ -154,20 +154,23 @@ bot.on('callback_query', function (query) {
 
                 break;
             case 'FIND_WISHES':
-                helpers.getWishes(chat.id).then(data => {
-                    let text = '';
-                    const keys = Object.keys(data);
-                    for (let wish in keys) {
-                        if (text.length >= 3000) {
-                            bot.sendMessage(chat.id, text, {parse_mode: 'HTML'});
-                            text = '\n'
-                        } else {
-                            text += `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
-                                `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}` + '\n\n'
+                helpers.getUser(chat.id).then(user => {
+                    // user.tags
+                    helpers.getWishes(chat.id).then(data => {
+                        let text = '';
+                        const keys = Object.keys(data);
+                        for (let wish in keys) {
+                            if (text.length >= 3000) {
+                                bot.sendMessage(chat.id, text, {parse_mode: 'HTML'});
+                                text = '\n'
+                            } else {
+                                text += `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
+                                    `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}` + '\n\n'
+                            }
                         }
-                    }
-                    bot.sendMessage(chat.id, text === '' ? 'Список пуст' : text, {parse_mode: 'HTML', ...keyboards.home})
-                        .then(() => bot.deleteMessage(chat.id, message_id));
+                        bot.sendMessage(chat.id, text === '' ? 'Список пуст' : text, {parse_mode: 'HTML', ...keyboards.home})
+                            .then(() => bot.deleteMessage(chat.id, message_id));
+                    });
                 });
 
                 break;
