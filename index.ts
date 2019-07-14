@@ -29,7 +29,7 @@ bot.onText(/\/home/, (msg) => {
 
     helpers.getUser(msg.chat.id).then(user => {
         if (user && user.phone_number) {
-            bot.sendMessage(msg.chat.id, frases.welcome_phone, keyboards.home)
+            bot.sendMessage(msg.chat.id, frases.welcome, keyboards.home)
         } else {
             bot.sendMessage(msg.chat.id, frases.welcome_phone, keyboards.phone);
         }
