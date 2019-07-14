@@ -124,13 +124,8 @@ bot.on('callback_query', function (query) {
                 cache.put(chat.id, {payload: {}, state: 'ADD_TITLE'});
                 bot.sendMessage(chat.id, frases.add_title).then(() => bot.deleteMessage(chat.id, message_id));
                 break;
-            case kb.home.search.callback_data:
-                bot.sendMessage(chat.id, frases.develop)
-                    .then(() => bot.deleteMessage(chat.id, message_id)); //todo
-                break;
-            case kb.home.feedback.callback_data:
-                bot.sendMessage(chat.id, frases.develop)
-                    .then(() => bot.deleteMessage(chat.id, message_id)); //todo
+            case 'FEEDBACK':
+                bot.sendMessage(chat.id, frases.feedback);
                 break;
             case 'OPEN_SETTINGS':
                 helpers.getUser(chat.id).then(user => {
