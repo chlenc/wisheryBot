@@ -189,11 +189,6 @@ bot.on('callback_query', function (query) {
                     bot.sendMessage(chat.id, keyBoard.length === 0 ? 'Список пуст' : frases.cancel_wish, {reply_markup: {inline_keyboard: keyBoard}});
                 });
                 break;
-            case kb.home.share.callback_data:
-                bot.sendMessage(chat.id, frases.develop)
-                    .then(() => bot.deleteMessage(chat.id, message_id)); //todo
-                break;
-
         }
         if (cacheData != null) {
         }

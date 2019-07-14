@@ -20,7 +20,7 @@ module.exports = {
         search: {text: 'Найти', callback_data: helpers.marshal('FIND_WISHES')},
         add: {text: 'Добавить', callback_data: helpers.marshal('NEW_WISH')},
         feedback: {text: 'Обратная связь 📲', callback_data: helpers.marshal('FEEDBACK')},
-        share: {text: 'Поделиться', callback_data: helpers.marshal('SHARE')},
+        share: {text: 'Поделиться', switch_inline_query: '@@wisheryBot' },
         myWishes: {text: 'Мои виши', callback_data: helpers.marshal('MY_WISHES')},
         cancelWish: {text: 'Отменить виши', callback_data: helpers.marshal('CANCEL_WISHES')},
         settings: {text: 'Настройки', callback_data: helpers.marshal('OPEN_SETTINGS')},
