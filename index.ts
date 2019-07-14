@@ -1,9 +1,9 @@
 import * as TelegramBot from 'node-telegram-bot-api';
+
 require('dotenv').config();
 const frases = require('./assets/frases');
 const bot = new TelegramBot(process.env.TOKEN, {webHook: {port: +process.env.PORT}})
 bot.setWebHook(`${process.env.URL}/bot${process.env.TOKEN}`).catch(e => console.error(e));
-
 const helpers = require('./assets/helpers');
 const keyboards = require('./assets/keyboards');
 const kb = require('./assets/keyboard-buttons');
@@ -36,6 +36,17 @@ bot.onText(/\/home/, (msg) => {
     })
 
 });
+
+// bot.onText(/\/test/, (msg) => {
+//     const key = {text: 'test', callback_data: 'test'};
+//     const keyBoard = [[key]]
+//
+//     for (let i = 0; i <= 100; i++) {
+//         keyBoard.push([key])
+//     }
+//     bot.sendMessage(msg.chat.id, 'test', {reply_markup: {inline_keyboard: keyBoard}});
+//
+// });
 
 
 bot.on('message', (msg) => {
@@ -129,31 +140,53 @@ bot.on('callback_query', function (query) {
                 }).then(() => bot.deleteMessage(chat.id, message_id));
                 break;
             case 'MY_WISHES':
+
                 helpers.getWishes(chat.id).then(data => {
-                    console.log(data)
-                    const text = 'Список:\n\n' + Object.keys(data).map(wish => `${data[wish].title} ${helpers.getTime(data[wish].time)}`).join('\n');
-                    bot.sendMessage(chat.id, text, keyboards.home).then(() => bot.deleteMessage(chat.id, message_id));
-                });
-                break;
-            case 'FIND_WISHES':
-                helpers.getWishes().then(data => {
                     let text = '';
                     const keys = Object.keys(data);
-                    for(let wish in keys){
-                        if(text.length >= 3000){
+                    for (let wish in keys) {
+                        if (text.length >= 3000) {
                             bot.sendMessage(chat.id, text, {parse_mode: 'HTML'});
                             text = '\n'
-                        }else {
-                            text +=  `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
-                                `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}`+'\n\n'
+                        } else {
+                            text += `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
+                                `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}` + '\n\n'
                         }
                     }
-                    // const text = Object.keys(data).map(wish =>
-                    //     `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
-                    //     `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}`
-                    // ).join('\n');
-                    bot.sendMessage(chat.id, text, {parse_mode: 'HTML', ...keyboards.home})
+                    bot.sendMessage(chat.id, text === '' ? 'Список пуст' : text, {parse_mode: 'HTML', ...keyboards.home})
                         .then(() => bot.deleteMessage(chat.id, message_id));
+                });
+
+                break;
+            case 'FIND_WISHES':
+                helpers.getWishes(chat.id).then(data => {
+                    let text = '';
+                    const keys = Object.keys(data);
+                    for (let wish in keys) {
+                        if (text.length >= 3000) {
+                            bot.sendMessage(chat.id, text, {parse_mode: 'HTML'});
+                            text = '\n'
+                        } else {
+                            text += `<a href="tg://user?id=${data[wish].user_id}">${(data[wish].username || 'Пользователь')}</a> ` +
+                                `хочет ${data[wish].title} в ${helpers.getTime(data[wish].time)}` + '\n\n'
+                        }
+                    }
+                    bot.sendMessage(chat.id, text === '' ? 'Список пуст' : text, {parse_mode: 'HTML', ...keyboards.home})
+                        .then(() => bot.deleteMessage(chat.id, message_id));
+                });
+
+                break;
+            case 'CANCEL_WISHES':
+                helpers.getWishes().then(data => {
+                    const keyBoard = keyboards.cancel(data)
+                    bot.sendMessage(chat.id, keyBoard.length === 0 ? 'Список пуст' : frases.cancel_wish, {reply_markup: {inline_keyboard: keyBoard}});
+                });
+                break;
+            case 'CANCEL_WISH':
+                helpers.cancelWish(data.payload);
+                helpers.getWishes().then(data => {
+                    const keyBoard = keyboards.cancel(data);
+                    bot.sendMessage(chat.id, keyBoard.length === 0 ? 'Список пуст' : frases.cancel_wish, {reply_markup: {inline_keyboard: keyBoard}});
                 });
                 break;
             case kb.home.share.callback_data:

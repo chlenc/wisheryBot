@@ -11,6 +11,9 @@ module.exports = {
     updateUser(id, data) {
         return database.updateData('users/' + id, data)
     },
+    cancelWish(id){
+      return database.removeData(`wishes/${id}`)
+    },
     addWish(wish) {
         return database.pushData('wishes/', wish)
     },
@@ -22,7 +25,7 @@ module.exports = {
                 .map(key => ({...data[key], id: key}))
         });
     },
-    marshal: (state, payload) => JSON.stringify({state, payload: payload || {}}),
+    marshal: (state, payload?: any) => JSON.stringify({state, payload: payload || {}}),
     unmarshal: (data) => JSON.parse(data),
     getTime: (time) => new Date(time).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")
 

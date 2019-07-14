@@ -12,9 +12,10 @@ module.exports = {
     home: {
         reply_markup: {
             inline_keyboard: [
-                [kb.home.add, kb.home.search],
-                [kb.home.feedback, kb.home.settings],
-                [kb.home.myMatches, kb.home.share],
+                [kb.home.search],
+                [kb.home.add, kb.home.cancelWish],
+                [kb.home.myWishes, kb.home.settings],
+                [kb.home.feedback, kb.home.share],
             ]
         }
     },
@@ -59,5 +60,15 @@ module.exports = {
         }
 
     },
+
+    cancel(data) {
+        return data.map(({id, title}) => {
+                return [{
+                    text: `Отменить ${title}`,
+                    callback_data: helpers.marshal('CANCEL_WISH', id)
+                }]
+            }
+        );
+    }
 
 }
