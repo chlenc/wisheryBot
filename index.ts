@@ -25,6 +25,15 @@ bot.onText(/\/home/, (msg) => {
 });
 
 
+bot.onText(/\/test/, (msg) => {
+    helpers.getUsers().then(users => {
+        Object.keys(users).map(id => {
+            helpers.updateUser(id, {...users[id], tags: []})
+        })
+    })
+});
+
+
 bot.on('message', (msg) => {
     try {
         const chatId = msg.chat.id;
@@ -100,8 +109,8 @@ bot.on('callback_query', function (query) {
 
             //===========ADD==============\\
             case 'ADD_TIME':
-                cache.put(chat.id, {payload: {...cacheData.payload, time: data.payload}, state: 'ADD'});
                 helpers.getUser(chat.id).then(user => {
+                cache.put(chat.id, {payload: {...cacheData.payload, time: data.payload, tags: user.tags}, state: 'ADD'});
                     bot.sendMessage(chat.id, frases.settings_tags, tagsKeyboard(user.tags, 'TAGS'))
                         .then(() => bot.deleteMessage(chat.id, message_id));
                 });
