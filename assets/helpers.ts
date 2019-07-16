@@ -5,6 +5,9 @@ module.exports = {
     getUser(chatId) {
         return database.getData('users/' + chatId)
     },
+    getUsers() {
+        return database.getData('users/' )
+    },
     addUser(user) {
         return database.setData('users/' + user.id, user)
     },
