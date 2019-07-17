@@ -4,9 +4,9 @@ import { homeBtn, new_wish } from './assets/keyboard-buttons'
 
 require('dotenv').config();
 const frases = require('./assets/frases');
-const bot = new TelegramBot(process.env.TOKEN, {polling: true})
-// const bot = new TelegramBot(process.env.TOKEN, {webHook: {port: +process.env.PORT}})
-// bot.setWebHook(`${process.env.URL}/bot${process.env.TOKEN}`).catch(e => console.error(e));
+// const bot = new TelegramBot(process.env.TOKEN, {polling: true})
+const bot = new TelegramBot(process.env.TOKEN, {webHook: {port: +process.env.PORT}})
+bot.setWebHook(`${process.env.URL}/bot${process.env.TOKEN}`).catch(e => console.error(e));
 const helpers = require('./assets/helpers');
 const cache = require('memory-cache');
 const tagsList = require('./assets/tags').tags;
