@@ -1,9 +1,9 @@
+import * as kb from "./keyboard-buttons";
 import { ready } from "./keyboard-buttons";
+import * as TelegramBot from 'node-telegram-bot-api';
 
 const tags = require('./tags').tags;
 const helpers = require('./helpers');
-import * as TelegramBot from 'node-telegram-bot-api';
-import * as kb from './keyboard-buttons'
 
 export const defaultKeyboard: TelegramBot.SendMessageOptions = {
     reply_markup: {
@@ -73,9 +73,9 @@ export const cancelKey = (data) => {
             text: `Отменить ${title}`,
             callback_data: helpers.marshal('CANCEL_WISH', id)
         }]),
-        {
-            text: ready,
+        [{
+            ...ready,
             callback_data: helpers.marshal('GO_HOME')
-        }
+        }]
     ];
 }

@@ -23,9 +23,9 @@ bot.onText(/\/home/, (msg) => {
     goHome(msg.chat.id)
 });
 
-function goHome(id: string | number) {
+function goHome(id: string | number): Promise<TelegramBot.Message> {
     cache.del(id);
-    bot.sendMessage(id, frases.welcome, homeKeyboard)
+    return bot.sendMessage(id, frases.welcome, homeKeyboard)
 }
 
 bot.onText(/\/test/, (msg) => {
@@ -100,7 +100,9 @@ bot.on('callback_query', function (query) {
                             const matches = userTags.filter((obj) => wishTags.indexOf(obj) >= 0);
                             if (matches.length > 0 && +id !== chat.id) {
                                 bot.sendMessage(id, `<a href="tg://user?id=${chat.id}">${(chat.username || 'Пользователь')}</a> ` +
-                                    `хочет ${cacheData.payload.title} в ${helpers.getTime(cacheData.payload.time)}`, {parse_mode: 'HTML'})
+                                    `хочет ${cacheData.payload.title} в ${helpers.getTime(cacheData.payload.time)}`, {parse_mode: 'HTML'}).catch(e => {
+                                        console.log(`user ${users[id].first_name} ${id}`)
+                                })
                             }
                         })
                     })
@@ -126,7 +128,9 @@ bot.on('callback_query', function (query) {
                 bot.sendMessage(chat.id, frases.add_title).then(() => bot.deleteMessage(chat.id, message_id));
                 break;
             case 'GO_HOME':
-                goHome(chat.id);
+                goHome(chat.id).then(() => {
+                    bot.deleteMessage(chat.id, message_id);
+                });;
                 break;
             case 'FEEDBACK':
                 bot.sendMessage(chat.id, frases.feedback);
@@ -181,7 +185,7 @@ bot.on('callback_query', function (query) {
                 break;
             case 'CANCEL_WISHES':
                 helpers.getWishes(chat.id).then(data => {
-                    const keyBoard = cancelKey(data)
+                    const keyBoard = data ? cancelKey(data) : [];
                     bot.sendMessage(
                         chat.id,
                         keyBoard.length === 0 ? 'Список пуст' : frases.cancel_wish,
