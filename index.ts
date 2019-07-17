@@ -20,10 +20,13 @@ bot.onText(/\/start/, (msg) => {
 });
 
 bot.onText(/\/home/, (msg) => {
-    cache.del(msg.chat.id);
-    bot.sendMessage(msg.chat.id, frases.welcome, homeKeyboard)
+    goHome(msg.chat.id)
 });
 
+function goHome(id: string | number) {
+    cache.del(id);
+    bot.sendMessage(id, frases.welcome, homeKeyboard)
+}
 
 bot.onText(/\/test/, (msg) => {
     helpers.getUsers().then(users => {
@@ -39,8 +42,7 @@ bot.on('message', (msg) => {
         const chatId = msg.chat.id;
         let cacheData = cache.get(chatId);
         if (msg.text === homeBtn.text) {
-            cache.del(msg.chat.id);
-            bot.sendMessage(msg.chat.id, frases.welcome, homeKeyboard)
+            goHome(chatId)
         } else if (msg.text === new_wish.text) {
             cache.del(msg.chat.id);
             cache.put(msg.chat.id, {payload: {}, state: 'ADD_TITLE'});
@@ -96,7 +98,7 @@ bot.on('callback_query', function (query) {
                             const userTags = users[id].tags || [];
                             const wishTags = cacheData.payload.tags || [];
                             const matches = userTags.filter((obj) => wishTags.indexOf(obj) >= 0);
-                            if(matches.length > 0 && +id !== chat.id){
+                            if (matches.length > 0 && +id !== chat.id) {
                                 bot.sendMessage(id, `<a href="tg://user?id=${chat.id}">${(chat.username || 'Пользователь')}</a> ` +
                                     `хочет ${cacheData.payload.title} в ${helpers.getTime(cacheData.payload.time)}`, {parse_mode: 'HTML'})
                             }
@@ -110,7 +112,10 @@ bot.on('callback_query', function (query) {
             //===========ADD==============\\
             case 'ADD_TIME':
                 helpers.getUser(chat.id).then(user => {
-                cache.put(chat.id, {payload: {...cacheData.payload, time: data.payload, tags: user.tags}, state: 'ADD'});
+                    cache.put(chat.id, {
+                        payload: {...cacheData.payload, time: data.payload, tags: user.tags},
+                        state: 'ADD'
+                    });
                     bot.sendMessage(chat.id, frases.settings_tags, tagsKeyboard(user.tags, 'TAGS'))
                         .then(() => bot.deleteMessage(chat.id, message_id));
                 });
@@ -119,6 +124,9 @@ bot.on('callback_query', function (query) {
             case 'NEW_WISH':
                 cache.put(chat.id, {payload: {}, state: 'ADD_TITLE'});
                 bot.sendMessage(chat.id, frases.add_title).then(() => bot.deleteMessage(chat.id, message_id));
+                break;
+            case 'GO_HOME':
+                goHome(chat.id);
                 break;
             case 'FEEDBACK':
                 bot.sendMessage(chat.id, frases.feedback);
@@ -156,7 +164,7 @@ bot.on('callback_query', function (query) {
                         let text = '';
                         const keys = Object.keys(data);
                         for (let wish in keys) {
-                            if(data[wish].user_id === user.user_id) continue;
+                            if (data[wish].user_id === user.user_id) continue;
                             if (text.length >= 3000) {
                                 bot.sendMessage(chat.id, text, {parse_mode: 'HTML'});
                                 text = '\n'

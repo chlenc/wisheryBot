@@ -1,3 +1,5 @@
+import { ready } from "./keyboard-buttons";
+
 const tags = require('./tags').tags;
 const helpers = require('./helpers');
 import * as TelegramBot from 'node-telegram-bot-api';
@@ -5,7 +7,7 @@ import * as kb from './keyboard-buttons'
 
 export const defaultKeyboard: TelegramBot.SendMessageOptions = {
     reply_markup: {
-        keyboard: [[kb.new_wish],[kb.homeBtn]],
+        keyboard: [[kb.new_wish], [kb.homeBtn]],
         resize_keyboard: true
     }
 }
@@ -66,11 +68,14 @@ export const add_time = () => {
 }
 
 export const cancelKey = (data) => {
-    return data.map(({id, title}) => {
-            return [{
-                text: `Отменить ${title}`,
-                callback_data: helpers.marshal('CANCEL_WISH', id)
-            }]
+    return [
+        ...data.map(({id, title}) => [{
+            text: `Отменить ${title}`,
+            callback_data: helpers.marshal('CANCEL_WISH', id)
+        }]),
+        {
+            text: ready,
+            callback_data: helpers.marshal('GO_HOME')
         }
-    );
+    ];
 }

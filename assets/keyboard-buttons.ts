@@ -7,6 +7,9 @@ export const homeBtn = {
 export const cancel = {
     text: 'Отменить ❌',
 }
+export const ready = {
+    text: 'Готово ✅',
+}
 export const new_wish = {
     text: 'Добавить виш 🌱',
 }
