@@ -152,10 +152,11 @@ bot.on('callback_query', function (query) {
             case 'FIND_WISHES':
                 helpers.getUser(chat.id).then(user => {
                     // user.tags
-                    helpers.getWishes(chat.id).then(data => {
+                    helpers.getWishes().then(data => {
                         let text = '';
                         const keys = Object.keys(data);
                         for (let wish in keys) {
+                            if(data[wish].user_id === user.user_id) continue;
                             if (text.length >= 3000) {
                                 bot.sendMessage(chat.id, text, {parse_mode: 'HTML'});
                                 text = '\n'
