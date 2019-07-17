@@ -98,7 +98,7 @@ bot.on('callback_query', function (query) {
                             const matches = userTags.filter((obj) => wishTags.indexOf(obj) >= 0);
                             if(matches.length > 0 && +id !== chat.id){
                                 bot.sendMessage(id, `<a href="tg://user?id=${chat.id}">${(chat.username || 'Пользователь')}</a> ` +
-                                    `хочет ${cacheData.payload.title} в ${helpers.getTime(cacheData.payload.time)}`)
+                                    `хочет ${cacheData.payload.title} в ${helpers.getTime(cacheData.payload.time)}`, {parse_mode: 'HTML'})
                             }
                         })
                     })
