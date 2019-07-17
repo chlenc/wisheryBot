@@ -185,7 +185,7 @@ bot.on('callback_query', function (query) {
                 break;
             case 'CANCEL_WISH':
                 helpers.cancelWish(data.payload);
-                helpers.getWishes().then(data => {
+                helpers.getWishes(chat.id).then(data => {
                     const keyBoard = data ? cancelKey(data) : [];
                     bot.sendMessage(
                         chat.id,
