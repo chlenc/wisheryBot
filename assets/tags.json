@@ -1,20 +1,24 @@
 {
   "tags": [
     {
-      "name": "Пинг понг",
-      "code": "ping"
+      "name": "Обед",
+      "code": "diner"
+    },
+    {
+      "name": "Спорт",
+      "code": "sport"
     },
     {
       "name": "Кофе",
       "code": "coffee"
     },
     {
-      "name": "Блокчейн",
-      "code": "block"
+      "name": "День рождения",
+      "code": "hb"
     },
     {
-      "name": "Обед",
-      "code": "dinner"
+      "name": "Прочее",
+      "code": "others"
     }
   ]
 }
